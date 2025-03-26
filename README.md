@@ -62,7 +62,7 @@ func NewRateLimiter() *RateLimiter {
 }
 ```
 
-## Fix Current Access with sync.Mutext
+## Fix Current Access with sync.Mutex
 
 ```golang
 // RateLimiterMiddleware - 建立 ratelimiter middleware
