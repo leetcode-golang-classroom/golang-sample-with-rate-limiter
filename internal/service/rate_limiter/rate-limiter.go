@@ -5,6 +5,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"sync"
 
 	"golang.org/x/time/rate"
 )
@@ -24,15 +25,18 @@ func (r *RateLimiter) getIP(req *http.Request) string {
 // RateLimiterMiddleware - 建立 ratelimiter middleware
 func (r *RateLimiter) RateLimiterMiddleware(next http.Handler, limit rate.Limit, burst int) http.Handler {
 	ipLimiterMap := make(map[string]*rate.Limiter)
+	var mu sync.Mutex
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		// Fetch IP
 		ip := r.getIP(req)
 		// Create limiter if not present for IP
+		mu.Lock()
 		limiter, exists := ipLimiterMap[ip]
 		if !exists {
 			limiter = rate.NewLimiter(limit, burst)
 			ipLimiterMap[ip] = limiter
 		}
+		mu.Unlock()
 		// return error if the limit has been reached
 		if !limiter.Allow() {
 			w.Header().Set("Content-Type", "application/json")

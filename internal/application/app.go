@@ -34,7 +34,7 @@ func New(appConfig *config.Config) *App {
 func (app *App) Start(ctx context.Context) error {
 	// setup rateLimiter
 	rateLimitMux := rateLimiter.NewRateLimiter()
-	handler := rateLimitMux.RateLimiterMiddleware(app.router, rate.Limit(1), 10)
+	handler := rateLimitMux.RateLimiterMiddleware(app.router, rate.Limit(2), 10)
 	// setup server
 	server := &http.Server{
 		Addr:    fmt.Sprintf(":%s", app.appConfig.Port),
